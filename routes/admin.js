@@ -3,6 +3,7 @@ const { z } = require("zod");
 const bcrypt = require("bcrypt");
 
 const adminRouter = Router();
+const { Admin } = require("../db");
 const {
   requiredBodySchema,
   requireSigninBody,
@@ -106,9 +107,15 @@ adminRouter.post("/sigin", async (req, res) => {
 });
 
 adminRouter.post("/course", (req, res) => {
-  res.json({
-    message: "Admin can create course",
-  });
+  // create a course by creator or admin
+  try {
+    // zod validation
+  } catch (error) {
+    res.status(500).json({
+      message: "Something went wrong!",
+      error: error,
+    });
+  }
 });
 
 adminRouter.put("/course", (req, res) => {
