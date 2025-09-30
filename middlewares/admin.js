@@ -1,4 +1,5 @@
 const { JWT_ADMIN_SECRET } = require("../config");
+const jwt = require("jsonwebtoken");
 
 // Auth middleware
 const authAdminMiddleware = (req, res, next) => {
@@ -14,7 +15,7 @@ const authAdminMiddleware = (req, res, next) => {
     const token = authHeader;
     const verifiedUser = jwt.verify(token, JWT_ADMIN_SECRET);
 
-    req.userId = verifiedUser.id; // attach decoded payload (id)
+    req.adminId = verifiedUser.id; // attach decoded payload (id)
     next();
   } catch (error) {
     return res

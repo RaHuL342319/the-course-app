@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const userRouter = Router();
-const { User } = require("../db");
+const { User, Purchase, Course } = require("../db");
 const { JWT_USER_SECRET } = require("../config");
 const { authUserMiddleware } = require("../middlewares/user");
 const { requiredBodySchema, requireSigninBody } = require("../validators/user");
@@ -98,12 +98,27 @@ userRouter.post("/signin", async (req, res) => {
   }
 });
 
-userRouter.get("/purchases", authUserMiddleware, (req, res) => {
-  const userId = req.userId;
-  res.json({
-    message: "Purchased course",
-    userId: userId,
-  });
+userRouter.get("/purchases", authUserMiddleware, async (req, res) => {
+  try {
+    const userId = req.userId;
+    // find all purchases for this user & populate course details
+    const purchases = await Purchase.find({ userId });
+
+    const courses = await Course.find({
+      _id: { $in: purchases.map((x) => x.courseId) },
+    });
+    res.json({
+      message: "Purchased course",
+      data: {
+        courses: courses,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Something went Wrong",
+      error: error,
+    });
+  }
 });
 
 module.exports = {
